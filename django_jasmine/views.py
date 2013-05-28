@@ -9,9 +9,9 @@ from django.utils import simplejson
 logger = logging.getLogger("django_jasmine")
 
 
-def run_tests(request, path):
+def run_tests(request, package):
     """Run the jasmine tests and render index.html"""
-    root = os.path.join(settings.JASMINE_TEST_DIRECTORY, path)
+    root = os.path.join(settings.JASMINE_TEST_DIRECTORY, package)
     # Get all files in spec dir and subdirs
     all_files = []
     for curpath, dirs, files in os.walk(os.path.join(root, "spec")):
@@ -26,6 +26,7 @@ def run_tests(request, path):
     # defaults
     suite['js_files'] = []
     suite['static_files'] = []
+    suite['media_files'] = []
 
     # load files.json if present
     if os.path.exists(os.path.join(root, "files.json")):
@@ -42,7 +43,8 @@ def run_tests(request, path):
         suite.update(json)
 
     data = {
-        'files': [path + file for file in all_files if file.endswith('js')],
+        'files': [file for file in all_files if file.endswith('js')],
+        'package': package,
         'suite': suite,
     }
 
